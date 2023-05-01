@@ -17,6 +17,9 @@ class Database:
     async def is_chat_registered(self, chat_id: str):
         return bool(await self.chats_collection.find_one({'chat_id': chat_id}))
     
+    async def get_all_chats_ids(self):
+        return [int(chat_id) for chat_id in await self.chats_collection.distinct('chat_id')]
+    
     async def get_available_jokes(self, chat_id: str):
         return (await self.chats_collection.find_one({'chat_id': chat_id}))['available_jokes']
     
