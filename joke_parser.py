@@ -1,21 +1,17 @@
-import requests
+import aiohttp
 from bs4 import BeautifulSoup
 
 import random
 
 
 BASE_URL = 'https://baneks.ru/'
-# JOKE_COUNT = 1143
 
-
-# class Joke:
-
-#     def __init__(self, available_jokes):
-#         self.numbers = list(range(1, available_jokes))
 
 async def get_joke(available_jokes: list):
     joke_number = random.SystemRandom().choice(available_jokes)
-    joke_request = requests.get(BASE_URL + str(joke_number))
-    joke_request.encoding = 'utf-8'
-    joke = BeautifulSoup(joke_request.text, 'lxml').find('p').text.replace('\n\n', '\n').strip().strip('\n')
-    return joke_number, joke
+    async with aiohttp.ClientSession() as session:
+        async with session.get(BASE_URL + str(joke_number)) as joke_response:
+            print(joke_response.charset)
+            joke = await joke_response.text(errors='ignore')
+    joke = BeautifulSoup(joke, 'lxml').find('p').text.replace('\n\n', '\n').strip().strip('\n')
+    return joke, joke_number
